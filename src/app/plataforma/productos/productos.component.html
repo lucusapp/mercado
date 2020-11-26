@@ -1,0 +1,134 @@
+ <span class="fill-remaining-space"></span>
+
+<div class="row d-flex justify-content-around">
+
+  <div class="search-div">
+    <button mat-raised-button 
+      (click)="onCreate()">
+      <mat-icon>add</mat-icon>Create
+    </button>
+    <button mat-raised-button>
+      <mat-icon>add</mat-icon>Categoria
+    </button>
+    <mat-form-field class="search-form-field" floatLabel="never">
+      <input matInput 
+      placeholder="Search" 
+      autocomplete="off" 
+      [(ngModel)]="searchKey" 
+      (keyup)="applyFilter()">
+      <button mat-button 
+      matSuffix 
+      mat-icon-button 
+      *ngIf="searchKey" 
+      aria-label="Clear"
+      (click)="onSearchClear()">
+      <mat-icon>search icon</mat-icon> Buscar
+      </button>
+  </mat-form-field>
+
+    <div class="container">
+      <button mat-raised-button color="primary"
+    
+      >Descargar
+        <mat-icon>trending_down</mat-icon>
+      </button>
+      <button mat-raised-button color="accent">Filtrar</button>
+    </div>
+  </div> 
+
+
+<div class="row d-flex justify-content-around">
+
+  <div class="search-div">
+      <mat-form-field class="search-form-field2" floatLabel="never" [formGroup]="idProducto">
+            <input matInput 
+            placeholder="Id del Producto" 
+            class="form-control ml=3"
+            formControlName="id">       
+
+          <mat-radio-group formControlName="origen" multiple class="input-group-prepend mt-3">
+            <mat-radio-button value="1">Ebay</mat-radio-button>
+            <mat-radio-button value="2">Amazon</mat-radio-button>
+            <mat-radio-button value="3">Aliexpress</mat-radio-button>
+          </mat-radio-group> 
+    </mat-form-field>
+    <button mat-raised-button color="primary" class="btn-block"
+    (click)="enviarId()">
+    <mat-icon>search icon</mat-icon> Buscar 
+    </button>  
+
+  </div>    
+</div>  
+
+
+
+<div class="mat-elevation-z8 mt-1">
+    <table mat-table [dataSource]="listaProductos" matSort>
+        <ng-container matColumnDef="Title">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="titulo" class="header">Producto</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.Title}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Description">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="Description" class="header">Caracteristicas</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.Description| slice:0:200}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Marca" layout-align="center"  >
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="header">Marca</mat-header-cell>
+            <mat-cell *matCellDef="let element" center>{{element.Marca}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="StartPrice">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="StartPrice" class="header">Precio</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.StartPrice}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Category">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="categoria" class="header">Categoria</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.Category}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Quantity">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="Quantity" class="header">Cantidad</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.Quantity}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="PicURL">
+           <mat-header-cell *matHeaderCellDef  class="header"> Imagenes</mat-header-cell>
+           <mat-cell *matCellDef="let element">
+            <span *ngFor="let picture of element.PicURL; let i=index">
+             {{element.picture}}
+              <img src="{{picture}}" width="100">
+            </span>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="accion">
+            <mat-header-cell *matHeaderCellDef class="header">Acciones</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <button mat-icon-button (click)="onEdit(row)"><mat-icon>launch</mat-icon></button>
+              <button mat-icon-button color="warn" (click)="onDelete(row.$key)"><mat-icon>delete_outline</mat-icon></button>
+            </mat-cell>
+        </ng-container>
+        <app-loading *ngIf="loading"></app-loading> 
+       
+        <ng-container matColumnDef="loading">
+            <mat-footer-cell *matFooterCellDef colspan="6">
+              Loading data...
+            </mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="noData">
+          <mat-footer-cell *matFooterCellDef colspan="6">
+            No Data.
+          </mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef = "displayedColums"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColums;"></mat-row>
+        <mat-footer-row 
+        *matFooterRowDef="['loading']" 
+        [ngClass]="{'hide':listaProductos != null}">
+      </mat-footer-row>
+      <mat-footer-row 
+      *matFooterRowDef="['noData']" 
+      [ngClass]="{'hide' : !(listData != null && listData.data.length == 0)}">
+    </mat-footer-row>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20, 30]" [pageSize]="10" showFirstLastButtons>
+    </mat-paginator>
+</div>
+

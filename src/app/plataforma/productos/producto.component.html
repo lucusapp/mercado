@@ -1,0 +1,134 @@
+<mat-toolbar>
+  <span
+  >{{proService.forma.controls['$key'].value
+  ? 'Modificar Producto'
+  : 'Nuevo Producto'}}
+</span>
+
+<span class="fill-remaining-space"></span>
+<button class="btn-dialog-close" mat-stroked-button (click)="onClose()" tabIndex="-1"><mat-icon>clear</mat-icon></button>
+</mat-toolbar>
+<form [formGroup]="proService.forma" class="normal-form" (submit)="onSubmit()">
+    <mat-grid-list cols="2" rowHeight="700px">
+        <mat-grid-tile>
+          <mat-dialog-content>
+
+            <div class="controles-container">
+              <input type="hidden" formControlName="$key">
+              <mat-form-field>
+                <input formControlName="Title" matInput placeholder="titulo">
+                <mat-error>El nombre es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="Marca" matInput placeholder="marca">
+                <mat-error>La marca es necesaria</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="StartPrice" matInput placeholder="precio">
+                <mat-error>El precio es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-select formControlName="Category" placeholder="Category">
+                  <ng-container *ngFor="let categoria of proService.cateArray">
+                    <mat-option value="{{categoria.CategoryID}}">{{categoria.CategoryName}}</mat-option>
+                  </ng-container>
+                <mat-error>La categoria es necesaria</mat-error>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="Quantity" matInput placeholder="cantidad">
+                <mat-error>La cantidad es necesaria</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <textarea formControlName="Description" matInput placeholder="caracteristicas"></textarea>
+              </mat-form-field>   
+            </div>
+          </mat-dialog-content>
+          </mat-grid-tile>
+
+          <app-loading *ngIf="proService.loading"></app-loading>
+
+
+          <mat-grid-tile>
+            <mat-dialog-content>
+              <div class="controles-container">
+                <div  formArrayName="PicURL">
+                  <cdk-virtual-scroll-viewport itemSize="4" class="input-container">
+                  <div class="d-flex start mt-2" *ngFor="let imagen of imagens.controls; let i=index">
+       
+                    <mat-form-field  >
+                      <input [formControlName]="i"  matInput placeholder="imagens">
+                    </mat-form-field>
+                    <button class="btn btn-danger ml-4" (click)="borrarImagen(i)">
+                      <span class="material-icons">
+                        delete_forever
+                        </span>
+                    </button>
+                  </div>
+                  
+                </cdk-virtual-scroll-viewport>
+                  <div class="d-flex justify-content-between">
+                    <button
+                    (click)="agregarUrl()"
+                    type="button"
+                    class="btn btn-primary mt-1"
+                    >
+                    Agregar Url
+                  </button>
+                  <button
+                  (click)="agregarImagen()"
+                  type="button"
+                  class="btn btn-primary mt-1"
+                  >
+                  Agregar imagen
+                </button>
+              </div>
+                <div class="row d-flex mt-5">
+                  <div class="row d-flex mr-2" *ngFor="let imagen of imagenes">
+                    <div class="d-flex flex-column ml-5">
+                      <img
+                      src="{{imagen}}"
+                      class="form-group row"
+                      alt="..."
+                      width="100"
+                      height="100"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+                <!-- <div class="add-botton-padding">
+                  <mat-radio-group formControlName="origen" multiple>
+                    <mat-radio-button value="1">Ebay</mat-radio-button>
+                    <mat-radio-button value="2">Amazon</mat-radio-button>
+                    <mat-radio-button value="3">Aliexpress</mat-radio-button>
+                  </mat-radio-group>
+                </div> -->
+                <!-- <mat-form-field class="add-bottom-padding">
+                  <input formControlName="fecha" matInput [matDatepicker]="picker" placeholder="Fecha">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>  -->
+                <div class="button-row">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="proService.forma.invalid">Submit</button>
+                  <button mat-raised-button color="warn" (click)="onClear()">Clear</button>
+                </div>    
+              </div>
+
+
+
+
+
+
+
+              </mat-dialog-content>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </form>
+<pre>
+  Estado del formulario : {{proService.forma.valid}}
+  <!-- tamaño del arreglo : {{proService.imaArray.length}} -->
+</pre>
+<!-- <pre>
+  {{proService.forma.value|json}}
+</pre> -->
