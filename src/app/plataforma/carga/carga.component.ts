@@ -4,6 +4,7 @@ import { ProductosService } from 'src/app/servicios/productos.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
+import { FormArray, FormControl } from '@angular/forms';
 
 export interface Item {url: string; }
 
@@ -48,6 +49,10 @@ export class CargaComponent implements OnInit {
   pruebaSobre(event){
     console.log(event)
   }
-  
+  enviarImg(archivo){
+    console.log(archivo.url)
+    const imagenes=this.prodServ.forma.get('PicURL').value as FormArray 
+    imagenes.push(archivo.url)
+  }
 
 }

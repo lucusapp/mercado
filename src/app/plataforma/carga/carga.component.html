@@ -43,13 +43,14 @@
                         <div class="progress-bar" role="progressbar" [ngStyle]="{'width': archivo.progreso + '%'}"></div>
                       </div>
                 </td>
+                <button class="btn btn-primary" (click)="enviarImg(archivo)">Enviar</button>
             </tr>
         </tbody>
     </table>
-    <div class="card-columns">
+    <!-- <div class="card-columns">
         <div class="card" *ngFor="let item of items | async">
           <img class="card-img-top" [src]="item.url">
         </div>
-    </div>
+    </div> -->
 </div>
 

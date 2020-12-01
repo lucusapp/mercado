@@ -56,6 +56,7 @@ private CARPETA_IMG = 'img'
 
     
  guardarImagen(imagen: {url:string}){
+   console.log(imagen)
   this.db.collection(`${this.CARPETA_IMG}`)
          .add(imagen)
 }
@@ -262,7 +263,7 @@ cargarImagenesFire(imagenes: FileItem[]){
             // })     
   }
 
-
+  
   // CATEGORIAS
 
   categoria:FormGroup =this.fb.group({

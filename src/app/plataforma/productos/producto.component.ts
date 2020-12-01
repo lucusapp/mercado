@@ -39,9 +39,6 @@ export class ProductoComponent implements OnInit {
 
   imagenes;
 
-  
-
-  
    
   ngOnInit() {
      this.proService.getProductos()
@@ -55,7 +52,6 @@ export class ProductoComponent implements OnInit {
      
      return this.proService.forma.get('PicURL') as FormArray 
     }
-   
 
   onClear(){
     this.proService.forma.reset();
