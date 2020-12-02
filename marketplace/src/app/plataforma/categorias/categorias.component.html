@@ -1,0 +1,46 @@
+
+<button class="btn-dialog-close" mat-stroked-button (click)="onClose()" tabIndex="-1"><mat-icon>clear</mat-icon></button>
+
+<form [formGroup]="proServ.categoria" class="normal-form" (submit)="onSubmit()">
+    <mat-grid-list cols="1" rowHeight="500px">
+        <mat-grid-tile>
+          <mat-dialog-content>
+            <div class="controles-container">
+              <input type="hidden" formControlName="$key">
+              <mat-form-field>
+                <input formControlName="CategoryID" matInput placeholder="CategoriaId">
+                <mat-error>El Id es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="CategoryLevel" matInput placeholder="CategoryLevel">
+                <mat-error>El CategoryLevel: es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="CategoryName" matInput placeholder="CategoryName">
+                <mat-error>El CategoryName es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="CategoryNamePath" matInput placeholder="CategoryNamePath">
+                <mat-error>El CategoryNamePath es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="CategoryParentID" matInput placeholder="CategoryParentID">
+                <mat-error>El CategoryParentID es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="CategoryIDPath" matInput placeholder="CategoryIDPath">
+                <mat-error>El CategoryIDPath es necesario</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <input formControlName="LeafCategory" matInput placeholder="LeafCategory">
+                <mat-error>El LeafCategory es necesario</mat-error>
+              </mat-form-field>
+              <div class="button-row">
+                <button mat-raised-button color="primary" type="submit" >Submit</button>
+
+              </div> 
+            </div>
+          </mat-dialog-content>
+        </mat-grid-tile>
+    </mat-grid-list>
+</form>
