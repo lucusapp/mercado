@@ -11,10 +11,11 @@ import {producto} from '../models/producto.model'
 import { map } from 'rxjs/operators';
 
 import { FileItem } from '../models/file-item';
+import { identifierModuleUrl } from '@angular/compiler';
 
 
 const EXCEL_TYPE =
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const EXCEL_EXT = ".xlsx";
 
 
@@ -22,14 +23,16 @@ const EXCEL_EXT = ".xlsx";
   providedIn: 'root'
 })
 export class ProductosService {
-
-readonly UrlApi = "http://localhost:3000/";
-productos:AngularFireList <any>;
+  
+  readonly UrlApi = "http://localhost:3000/";
+  productos:AngularFireList <any>;
 categorias:AngularFireList <any>;
 cateArray = [];
-imaArray:[];
 prodScraper:any;
 loading:boolean;
+imaScrap = [];
+imaArray = []
+dataArray=[]
 private CARPETA_IMG = 'img'
 
 
@@ -56,7 +59,7 @@ private CARPETA_IMG = 'img'
 
     
  guardarImagen(imagen: {url:string}){
-   console.log(imagen)
+ //  console.log(imagen)
   this.db.collection(`${this.CARPETA_IMG}`)
          .add(imagen)
 }
@@ -116,7 +119,18 @@ cargarImagenesFire(imagenes: FileItem[]){
       ReturnProfileName:['Devoluciones aceptadas,Comprador,14 días#0',Validators.required],
       PaymentProfileName:['PayPal:Pago inmediato',Validators.required],
       Relationship:[''],
-      RelationshipDetails:['']
+      RelationshipDetails:[''],
+      Variantes: this.fb.array([this.fb.group({
+        id: [''],
+        name: [''],
+        imagen: ['']
+      })]),
+      Precios: this.fb.array([this.fb.group({
+        id:[''],
+        disponible:[''],
+        precioriginal:[''],
+        precioferta:['']
+      })])
    });
    initializeFormGroup(){
      this.forma= this.fb.group({
@@ -128,7 +142,7 @@ cargarImagenesFire(imagenes: FileItem[]){
       StoreCategory:'',
       Title:['',Validators.required],
       ConditionID:'1000',
-      Marca:'',
+      Marca:'predator',
       MPN:'No aplicable',
       Product:'No aplicable',
       EAN:'',
@@ -143,7 +157,16 @@ cargarImagenesFire(imagenes: FileItem[]){
       ReturnProfileName: 'Devoluciones aceptadas,Comprador,14 días#0',
       PaymentProfileName:'PayPal:Pago inmediato',
       Relationship:'',
-      RelationshipDetails:''
+      RelationshipDetails:'',
+      Variantes: this.fb.array([this.fb.group({
+        id: [''],
+        name: [''],
+        imagen :[''],
+        displayName: ['']
+      })]),
+      Precios: this.fb.array([this.fb.group({
+        optionValueIds:['']
+      })])
     })
   }
 
@@ -176,7 +199,9 @@ cargarImagenesFire(imagenes: FileItem[]){
       ReturnProfileName: producto.ReturnProfileName,
       PaymentProfileName:producto.PaymentProfileName,
       Relationship:producto.Relationship,
-      RelationshipDetails:producto.Relationship
+      RelationshipDetails:producto.Relationship,
+      Variantes: producto.Variantes,
+      Precios:producto.precios
     })
     console.log(producto)
   }
@@ -205,7 +230,9 @@ cargarImagenesFire(imagenes: FileItem[]){
         "ReturnProfileName": "",
         "PaymentProfileName":"",
         "Relationship":"",
-        "RelationshipDetails":""
+        "RelationshipDetails":"",
+        "Variantes": producto.Variantes,
+
       })
     }
     deleteProducto($key:string){
@@ -215,7 +242,7 @@ cargarImagenesFire(imagenes: FileItem[]){
   
    async cargarProducto(producto){
       // llega el producto desde el component a traves del elemento row
-      console.log(producto.PicURL) 
+     // console.log(producto.PicURL) 
       // se carga la data de row al formulario
       this.forma.patchValue(producto)
       //creamos una constante donde observamos que solamente carga el primer valor del array
@@ -229,11 +256,8 @@ cargarImagenesFire(imagenes: FileItem[]){
         // console.log(cadaImagen)
         pictures.push(new FormControl(cadaImagen))
         )
-        
-       this.imaArray= producto.PicURL
-        console.log(this.imaArray)
-      }
 
+      }
       async cargarScraper(){ 
           this.loading=true;
           setTimeout(() => {
@@ -245,7 +269,9 @@ cargarImagenesFire(imagenes: FileItem[]){
              .subscribe((resp)=>{
                console.log(resp)
                this.forma.patchValue(resp)
+               console.log(this.forma)
                const pictures = this.forma.get("PicURL") as FormArray
+               console.log(pictures)
                while (pictures.length) {
                 pictures.removeAt(0);
               }
@@ -253,9 +279,39 @@ cargarImagenesFire(imagenes: FileItem[]){
                 pictures.push(new FormControl(img))
               )
               this.imaArray= resp.PicURL
-              console.log(this.imaArray)     
-            })     
-          }, 8000);
+              console.log(this.imaArray)
+
+              
+              const variantes = this.forma.get("Variantes") as FormArray
+              const precios = this.forma.get("Precios") as FormArray
+              console.log(precios)
+              
+              
+              while (variantes.length){
+                variantes.removeAt(0)
+              }
+              
+              resp.Variantes.forEach(valor=>
+                variantes.push(this.fb.group({
+                  id:[valor.id],
+                  image:[valor.image],
+                  name:[valor.name],
+                  displayName:[valor.displayName]
+                })))    
+
+                
+                resp.Variantes.forEach(valor=>this.imaScrap.push(valor.image))           
+                console.log(this.imaScrap)
+                
+                while (precios.length){
+                  precios.removeAt(0)
+                }
+
+                resp.Precios.forEach(valorPrecios=>{return valorPrecios
+
+                 } )   
+            })   
+          }, 10000);
 
           //   await this.forma.reset({
             //   'Action(SiteID=Spain|Country=ES|Currency=EUR|Version=745)': 'add',

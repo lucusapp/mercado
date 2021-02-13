@@ -1,6 +1,6 @@
 import { Component} from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { ProductosService } from 'src/app/servicios/productos.service';
 
 @Component({

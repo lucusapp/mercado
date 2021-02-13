@@ -102,7 +102,7 @@ export class ProductosComponent implements OnInit {
     dialogConfig.width = '60%';
    // dialogConfig.height = '100%';
     this.dialog.open(ProductoComponent, dialogConfig);
-    this.prodServ.imaArray = []
+   // this.prodServ.imaArray = []
   }
   onEdit(row){
     console.log(row)
@@ -113,7 +113,7 @@ export class ProductosComponent implements OnInit {
     dialogConfig.width = '60%';
     //dialogConfig.height = '100%';
     this.dialog.open(ProductoComponent, dialogConfig);
-    this.prodServ.imaArray=row.imagenes
+    //this.prodServ.imaArray=row.imagenes
   }
 
   onDelete($key){
