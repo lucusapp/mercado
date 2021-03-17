@@ -125,6 +125,7 @@ export class ProductosComponent implements OnInit {
 
     if (this.idProducto.value.origen==="3") { 
       this.scrape.postId(this.idProducto.value)
+      this.scrape.emit('eventName',this.idProducto.value)
     }
   
       this.prodServ.cargarScraper()

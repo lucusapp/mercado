@@ -6,12 +6,12 @@ import * as firebase from 'firebase'
 import{ScraperService} from '../servicios/scraper.service';
 import * as Filesaver from "file-saver";
 import * as XLSX from "xlsx";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, JsonpClientBackend } from '@angular/common/http';
 import {producto} from '../models/producto.model'
 import { map } from 'rxjs/operators';
 
 import { FileItem } from '../models/file-item';
-import { identifierModuleUrl } from '@angular/compiler';
+
 
 
 const EXCEL_TYPE =
@@ -24,15 +24,16 @@ const EXCEL_EXT = ".xlsx";
 })
 export class ProductosService {
   
-  readonly UrlApi = "http://localhost:3000/";
-  productos:AngularFireList <any>;
+readonly UrlApi = "http://localhost:3000/";
+productos:AngularFireList <any>;
 categorias:AngularFireList <any>;
 cateArray = [];
 prodScraper:any;
 loading:boolean;
 imaScrap = [];
 imaArray = []
-dataArray=[]
+variantes = []
+
 private CARPETA_IMG = 'img'
 
 
@@ -123,13 +124,19 @@ cargarImagenesFire(imagenes: FileItem[]){
       Variantes: this.fb.array([this.fb.group({
         id: [''],
         name: [''],
-        imagen: ['']
+        image: [''],
+        originalPrice:['']
       })]),
       Precios: this.fb.array([this.fb.group({
+        availableQuantity:[''],
+        displayName: [''],
         id:[''],
-        disponible:[''],
-        precioriginal:[''],
-        precioferta:['']
+        image:[''],
+        name: [''],
+        optionValueIds: [''],
+        originalPrice: [''],
+        salePrice: [''],
+        skuId: [''],
       })])
    });
    initializeFormGroup(){
@@ -161,12 +168,20 @@ cargarImagenesFire(imagenes: FileItem[]){
       Variantes: this.fb.array([this.fb.group({
         id: [''],
         name: [''],
-        imagen :[''],
-        displayName: ['']
+        image :[''],
+        displayName: [''],
       })]),
       Precios: this.fb.array([this.fb.group({
-        optionValueIds:['']
-      })])
+        availableQuantity:[''],
+        displayName: [''],
+        id:[''],
+        image:[''],
+        name: [''],
+        optionValueIds: [''],
+        originalPrice: [''],
+        salePrice: [''],
+        skuId: [''],
+      })]),
     })
   }
 
@@ -201,7 +216,7 @@ cargarImagenesFire(imagenes: FileItem[]){
       Relationship:producto.Relationship,
       RelationshipDetails:producto.Relationship,
       Variantes: producto.Variantes,
-      Precios:producto.precios
+      Precios:producto.Precios
     })
     console.log(producto)
   }
@@ -232,6 +247,7 @@ cargarImagenesFire(imagenes: FileItem[]){
         "Relationship":"",
         "RelationshipDetails":"",
         "Variantes": producto.Variantes,
+        "Precios":producto.Precios
 
       })
     }
@@ -244,20 +260,31 @@ cargarImagenesFire(imagenes: FileItem[]){
       // llega el producto desde el component a traves del elemento row
      // console.log(producto.PicURL) 
       // se carga la data de row al formulario
-      this.forma.patchValue(producto)
+       this.forma.patchValue(producto)
       //creamos una constante donde observamos que solamente carga el primer valor del array
-      const pictures = this.forma.get("PicURL") as FormArray
-      console.log(pictures.value)
+      const pictures =  this.forma.get("PicURL") as FormArray
+        console.log(pictures.value)
       // eliminamos la data de la constante
-    while (pictures.length) {
-      pictures.removeAt(0);
+            while (pictures.length) {
+              pictures.removeAt(0);
+            }
+            producto.PicURL.forEach(cadaImagen=>
+            // console.log(cadaImagen)
+            pictures.push(new FormControl(cadaImagen))
+            )
+            
+      const modelos = this.forma.get("Precios") as FormArray
+            while (modelos.length){
+              modelos.removeAt(0)
+            }
+            // producto.Precios.forEach(cadaPrecio=>
+            //   modelos.push(new FormControl(cadaPrecio)))
     }
-        producto.PicURL.forEach(cadaImagen=>
-        // console.log(cadaImagen)
-        pictures.push(new FormControl(cadaImagen))
-        )
 
-      }
+
+
+
+
       async cargarScraper(){ 
           this.loading=true;
           setTimeout(() => {
@@ -275,16 +302,17 @@ cargarImagenesFire(imagenes: FileItem[]){
                while (pictures.length) {
                 pictures.removeAt(0);
               }
-              resp.PicURL.forEach(img=>
+              resp.PicURL.forEach(img=>{
+                //console.log(pictures)
                 pictures.push(new FormControl(img))
-              )
+              })
               this.imaArray= resp.PicURL
               console.log(this.imaArray)
 
               
               const variantes = this.forma.get("Variantes") as FormArray
               const precios = this.forma.get("Precios") as FormArray
-              console.log(precios)
+              console.log(precios.value)
               
               
               while (variantes.length){
@@ -298,7 +326,7 @@ cargarImagenesFire(imagenes: FileItem[]){
                   name:[valor.name],
                   displayName:[valor.displayName]
                 })))    
-
+ 
                 
                 resp.Variantes.forEach(valor=>this.imaScrap.push(valor.image))           
                 console.log(this.imaScrap)
@@ -307,19 +335,32 @@ cargarImagenesFire(imagenes: FileItem[]){
                   precios.removeAt(0)
                 }
 
-                resp.Precios.forEach(valorPrecios=>{return valorPrecios
-
-                 } )   
-            })   
-          }, 10000);
-
-          //   await this.forma.reset({
-            //   'Action(SiteID=Spain|Country=ES|Currency=EUR|Version=745)': 'add',
-            //   ItemID:this.prodScraper.ItemID    
-            // })     
-  }
-
-  
+                resp.Precios.forEach(precio=>{
+                  precios.push(this.fb.group({
+                      availableQuantity:[precio.availableQuantity],
+                      displayName: [precio.displayName],
+                      id:[precio.id],
+                      image:[precio.image.slice(0,-12)],
+                      name: [precio.name],
+                      optionValueIds: [precio.optionValueIds],
+                      originalPrice: [precio.originalPrice],
+                      salePrice: [precio.salePrice],
+                      skuId: [precio.skuId],
+   
+                  }))
+                 })
+                 console.log(this.forma.value)
+              })
+             
+              }, 10000);
+              
+              //   await this.forma.reset({
+                //   'Action(SiteID=Spain|Country=ES|Currency=EUR|Version=745)': 'add',
+                //   ItemID:this.prodScraper.ItemID    
+                // })     
+              }
+              
+              
   // CATEGORIAS
 
   categoria:FormGroup =this.fb.group({

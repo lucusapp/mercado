@@ -26,6 +26,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,8 +51,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
 
   ],
-  providers: [ProductosService,
+  providers: [
+    ProductosService,
     ScraperService,
+
     ],
   bootstrap: [AppComponent],
   entryComponents:[ProductoComponent,CargaComponent]

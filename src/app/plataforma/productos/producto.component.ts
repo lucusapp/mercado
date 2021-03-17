@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 
 import { ScraperService } from 'src/app/servicios/scraper.service';
 import { CargaComponent } from '../carga/carga.component';
-import { VariableAst } from '@angular/compiler';
+
 
 export interface Item { url: string; }
 @Component({
@@ -35,32 +35,30 @@ export class ProductoComponent implements OnInit {
                 this.itemsCollection = afs.collection<Item>('img')
                 this.items = this.itemsCollection.valueChanges()
                    
+                this.proService.getProductos()
+                this.proService.forma.valid
    }
 
 
   imagenes;
-  variables;
-  
+  modelos=[];
 
-   
   ngOnInit() {
-     this.proService.getProductos()
-     this.proService.forma.valid
-    }
-     get imagens(){
-     this.imagenes=this.proService.forma.get('PicURL').value as FormArray 
-    // console.log(this.imagenes);
-     
-     return this.proService.forma.get('PicURL') as FormArray 
+    this.scraper.listen('enviarId').subscribe((data)=>{console.log(data)}
+    )}
+    get imagens(){
+      this.imagenes=this.proService.forma.get('PicURL').value as FormArray 
+      // console.log(this.imagenes);    
+      return this.proService.forma.get('PicURL') as FormArray 
     }
 
-    get variants(){
-    this.variables=this.proService.forma.get('Variantes').value as FormArray
-     //console.log(this.variables)
-      return this.proService.forma.get('Variantes') as FormArray
+    get models(){
+      
+      const array =this.proService.forma.get('Precios').value as FormArray
+    console.log(array)
+
+      return this.proService.forma.get('Precios') as FormArray
     }
-
-
 
   onClear(){
     this.proService.forma.reset();
