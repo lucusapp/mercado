@@ -30,7 +30,7 @@ export class ProductoComponent implements OnInit {
               private scraper:ScraperService,
               public dialogRef:MatDialogRef<ProductoComponent>,
               public dialog:MatDialog,
-              public prodServ:ProductosService,
+
               private afs: AngularFirestore) {
                 this.itemsCollection = afs.collection<Item>('img')
                 this.items = this.itemsCollection.valueChanges()
@@ -55,7 +55,7 @@ export class ProductoComponent implements OnInit {
     get models(){
       
       const array =this.proService.forma.get('Precios').value as FormArray
-    console.log(array)
+    //console.log(array)
 
       return this.proService.forma.get('Precios') as FormArray
     }

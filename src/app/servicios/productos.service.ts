@@ -9,6 +9,8 @@ import * as XLSX from "xlsx";
 import { HttpClient, JsonpClientBackend } from '@angular/common/http';
 import {producto} from '../models/producto.model'
 import { map } from 'rxjs/operators';
+import {  Observable } from 'rxjs';
+import {io} from 'socket.io-client'
 
 import { FileItem } from '../models/file-item';
 
@@ -33,6 +35,7 @@ loading:boolean;
 imaScrap = [];
 imaArray = []
 variantes = []
+socket:any;
 
 private CARPETA_IMG = 'img'
 
@@ -56,6 +59,7 @@ private CARPETA_IMG = 'img'
                                    })
                                  }
                                )
+              this.socket = io(this.UrlApi)
               }
 
     
@@ -277,89 +281,118 @@ cargarImagenesFire(imagenes: FileItem[]){
             while (modelos.length){
               modelos.removeAt(0)
             }
-            // producto.Precios.forEach(cadaPrecio=>
-            //   modelos.push(new FormControl(cadaPrecio)))
+            producto.Precios.forEach(cadaPrecio=>
+              modelos.push(this.fb.group({
+                availableQuantity:[cadaPrecio.availableQuantity],
+                displayName: [cadaPrecio.displayName],
+                id:[cadaPrecio.id],
+                image:[cadaPrecio.image],
+                name: [cadaPrecio.name],
+                optionValueIds: [cadaPrecio.optionValueIds],
+                originalPrice: [cadaPrecio.originalPrice],
+                salePrice: [cadaPrecio.salePrice],
+                skuId: [cadaPrecio.skuId],
+   
+              }))
+              )}
+
+    listen(eventName:string){
+      return new Observable((subscriber)=>{
+        this.socket.on('enviarId',(data)=>{
+          console.log('conectado')
+          subscriber.next(data)
+        })
+      })
+    }
+    emit(enviarId:string, data:any){
+      this.socket.emit('enviarId',data,(prodScraper)=>{
+        this.prodScraper=prodScraper
+        console.log(this.prodScraper)
+        this.forma.patchValue(prodScraper)
+        console.log(this.forma)
+        const pictures = this.forma.get("PicURL") as FormArray
+        console.log(pictures)
+        while (pictures.length) {
+         pictures.removeAt(0);
+       }
+       prodScraper.PicURL.forEach(img=>{
+         //console.log(pictures)
+         pictures.push(new FormControl(img))
+       })
+       this.imaArray= prodScraper.PicURL
+       console.log(this.imaArray)
+    
+       
+       const variantes = this.forma.get("Variantes") as FormArray
+       console.log(variantes)
+       const precios = this.forma.get("Precios") as FormArray
+       console.log(precios.value)
+       
+       
+       while (variantes.length){
+         variantes.removeAt(0)
+       }
+       
+       prodScraper.Variantes.forEach(valor=>
+         variantes.push(this.fb.group({
+           id:[valor.id],
+           image:[valor.image],
+           name:[valor.name],
+           displayName:[valor.displayName]
+         })))    
+    
+         
+         prodScraper.Variantes.forEach(valor=>this.imaScrap.push(valor.image))           
+         console.log(this.imaScrap)
+         
+         while (precios.length){
+           precios.removeAt(0)
+         }
+    
+         prodScraper.Precios.forEach(precio=>{
+           precios.push(this.fb.group({
+               availableQuantity:[precio.availableQuantity],
+               displayName: [precio.displayName],
+               id:[precio.id],
+               image:[precio.image.slice(0,-12)],
+               name: [precio.name],
+               optionValueIds: [precio.optionValueIds],
+               originalPrice: [precio.originalPrice],
+               salePrice: [precio.salePrice],
+               skuId: [precio.skuId],
+    
+           }))
+          })
+          console.log(this.forma.value)
+       })
+      
+  
+      //})
+      console.log('la data es ',data)
     }
 
 
-
-
-
-      async cargarScraper(){ 
-          this.loading=true;
-          setTimeout(() => {
-            this.loading=false;
-            return  this.http.get<producto>(this.UrlApi)
-             .pipe(map(data=>{
-               return data['producScrape']
-             }))
-             .subscribe((resp)=>{
-               console.log(resp)
-               this.forma.patchValue(resp)
-               console.log(this.forma)
-               const pictures = this.forma.get("PicURL") as FormArray
-               console.log(pictures)
-               while (pictures.length) {
-                pictures.removeAt(0);
-              }
-              resp.PicURL.forEach(img=>{
-                //console.log(pictures)
-                pictures.push(new FormControl(img))
-              })
-              this.imaArray= resp.PicURL
-              console.log(this.imaArray)
-
-              
-              const variantes = this.forma.get("Variantes") as FormArray
-              const precios = this.forma.get("Precios") as FormArray
-              console.log(precios.value)
-              
-              
-              while (variantes.length){
-                variantes.removeAt(0)
-              }
-              
-              resp.Variantes.forEach(valor=>
-                variantes.push(this.fb.group({
-                  id:[valor.id],
-                  image:[valor.image],
-                  name:[valor.name],
-                  displayName:[valor.displayName]
-                })))    
- 
-                
-                resp.Variantes.forEach(valor=>this.imaScrap.push(valor.image))           
-                console.log(this.imaScrap)
-                
-                while (precios.length){
-                  precios.removeAt(0)
-                }
-
-                resp.Precios.forEach(precio=>{
-                  precios.push(this.fb.group({
-                      availableQuantity:[precio.availableQuantity],
-                      displayName: [precio.displayName],
-                      id:[precio.id],
-                      image:[precio.image.slice(0,-12)],
-                      name: [precio.name],
-                      optionValueIds: [precio.optionValueIds],
-                      originalPrice: [precio.originalPrice],
-                      salePrice: [precio.salePrice],
-                      skuId: [precio.skuId],
-   
-                  }))
-                 })
-                 console.log(this.forma.value)
-              })
-             
-              }, 10000);
+      // async cargarScraper(){ 
+      //     this.loading=true;
+      //     setTimeout(() => {
+      //       this.loading=false;
+      //       return  this.http.get<producto>(this.UrlApi)
+      //        .pipe(map(data=>{
+      //          return data['producScrape']
+      //        }))
+      //        .subscribe((resp)=>{
+      //          console.log(resp)
+            //  }, 10000);
               
               //   await this.forma.reset({
                 //   'Action(SiteID=Spain|Country=ES|Currency=EUR|Version=745)': 'add',
                 //   ItemID:this.prodScraper.ItemID    
                 // })     
-              }
-              
+            //  }
+        postId(idProducto){
+                console.log(idProducto)
+                  this.http.post(this.UrlApi,idProducto).subscribe()  
+              }        
               
   // CATEGORIAS
 
@@ -419,6 +452,3 @@ private saveAsExcel(buffer: any, filename: string) {
   }     
 
 }
-
-
-

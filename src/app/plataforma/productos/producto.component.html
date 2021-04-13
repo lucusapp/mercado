@@ -128,12 +128,12 @@
             height="100"
             />
           </div> -->
-          <div class="row d-flex mt-5" *ngIf="proService.variantes.length>0">
-            <div class="row" formArrayName="Precios" *ngFor="let variante of models.controls;let i=index">
+          <div class="row d-flex mt-5">
+            <div class="row"formArrayName="Precios" *ngFor="let variante of models.controls;let i=index">
               <div class="mt-2" cols=24 [formGroupName]="i">
                 <input  formControlName="image" style="WIDTH: 1028px">
                 <div class="d-flex justify-content-between mt-2">
-                        <img src="{{image}}" class="form-group row" alt="..." width="100" height="100"/>
+                        <img [csrc]="image" class="form-group row" alt="..." width="100" height="100"/>
                         <mat-form-field  >
                           <input formControlName="originalPrice"   matInput placeholder="Precio">
                         </mat-form-field>                      
@@ -143,11 +143,8 @@
                         <mat-form-field  >
                           <input formControlName="name"   matInput placeholder="Modelo">
                         </mat-form-field> 
-                      </div>                
-            
-                                  
+                      </div>                                                 
                     </div>
-
             </div>
           </div>
         </form>

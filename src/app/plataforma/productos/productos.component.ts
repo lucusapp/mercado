@@ -124,11 +124,11 @@ export class ProductosComponent implements OnInit {
     this.prodServ.initializeFormGroup();
 
     if (this.idProducto.value.origen==="3") { 
-      this.scrape.postId(this.idProducto.value)
-      this.scrape.emit('eventName',this.idProducto.value)
+      this.prodServ.postId(this.idProducto.value)
+      this.prodServ.emit('eventName',this.idProducto.value)
     }
   
-      this.prodServ.cargarScraper()
+
      
    const dialogConfig = new MatDialogConfig();
    dialogConfig.disableClose = false;
